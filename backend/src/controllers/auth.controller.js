@@ -3,8 +3,8 @@ const bcrypt = require('bcrypt');
 const {JWT_SECRET} = require('../config/env');
 const promisePool = require('../config/database');
 
-function signToken(username) {
-    return jwt.sign({username}, JWT_SECRET, {expiresIn: '0.5h'});
+function signToken(username, userId) {
+    return jwt.sign({username, userId}, JWT_SECRET, {expiresIn: '24h'}); 
 }
 
 async function register(req, res) {
@@ -13,7 +13,7 @@ async function register(req, res) {
         if(!username || !password) {
             return res.status(400).json({
                 code: 400,
-                message: 'Username and password are required'
+                message: '用户名和密码不能为空'
             });
         }
 
@@ -22,22 +22,24 @@ async function register(req, res) {
         if(rows.length > 0) {
             return res.status(400).json({
                 code: 400,
-                message: 'Username already exists'
+                message: '用户名已存在'
             });
         }
 
         // hash密码存储
         const hashedPassword = await bcrypt.hash(password, 10);
-        await promisePool.query('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword]);
+        const [insertResult] = await promisePool.query('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword]);
+        const userId = insertResult.insertId;
         console.log('注册成功',username);   
         return res.status(201).json({
             code: 201,
-            message: 'User registered successfully',
-            token: signToken(username)
+            message: '注册成功',
+            token: signToken(username,userId)
         });
 
     } catch (error) {
-        res.status(500).json({message: 'Internal server error'});
+        console.error('注册失败',error);
+        res.status(500).json({message: '服务器错误'});
     }
 }
 
@@ -47,7 +49,7 @@ async function login(req, res) {
         if(!username || !password) {
             return res.status(400).json({
                 code: 400,
-                message: 'Username and password are required'
+                message: '用户名和密码不能为空'
             });
         }
 
@@ -56,7 +58,7 @@ async function login(req, res) {
         if(rows.length === 0) {
             return res.status(400).json({
                 code: 400,
-                message: 'Username not found'
+                message: '用户名不存在'
             });
         }
 
@@ -66,17 +68,20 @@ async function login(req, res) {
         if(!isPasswordValid) {
             return res.status(400).json({
                 code: 400,
-                message: 'Invalid password'
+                message: '密码错误'
             });
         }
         console.log('登录成功',username);
+
+        const userId = user.id;
         return res.status(200).json({
             code: 200,
-            message: 'Login successful',
-            token: signToken(username)
+            message: '登录成功',
+            token: signToken(username,userId),
         });
     } catch (error) {
-        res.status(500).json({message: 'Internal server error'});
+        console.error('登录失败',error);
+        res.status(500).json({message: '服务器错误'});
     }
 }
 

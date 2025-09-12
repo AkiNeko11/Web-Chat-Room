@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网络聊天室</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 登录/注册区域 -->
+        <div id="auth-section" class="auth-section">
+            <div class="auth-container">
+                <h1>网络聊天室</h1>
+                
+                <!-- 登录表单 -->
+                <div id="login-form" class="form-container">
+                    <h2>登录</h2>
+                    <form id="loginForm">
+                        <input type="text" id="loginUsername" placeholder="用户名" required>
+                        <input type="password" id="loginPassword" placeholder="密码" required>
+                        <button type="submit">登录</button>
+                    </form>
+                    <p>还没有账号？<a href="#" id="showRegister">点击注册</a></p>
+                </div>
+                
+                <!-- 注册表单 -->
+                <div id="register-form" class="form-container" style="display: none;">
+                    <h2>注册</h2>
+                    <form id="registerForm">
+                        <input type="text" id="registerUsername" placeholder="用户名" required>
+                        <input type="password" id="registerPassword" placeholder="密码" required>
+                        <button type="submit">注册</button>
+                    </form>
+                    <p>已有账号？<a href="#" id="showLogin">点击登录</a></p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 聊天室区域 -->
+        <div id="chat-section" class="chat-section" style="display: none;">
+            <div class="chat-container">
+                <!-- 侧边栏 -->
+                <div class="sidebar">
+                    <div class="user-info">
+                        <h3 id="currentUser">用户名</h3>
+                        <button id="logoutBtn">退出登录</button>
+                    </div>
+                    
+                    <div class="room-section">
+                        <h4>房间管理</h4>
+                        <div class="room-actions">
+                            <input type="text" id="newRoomName" placeholder="房间名称">
+                            <button id="createRoomBtn">创建房间</button>
+                        </div>
+                        <div class="room-actions">
+                            <input type="text" id="joinRoomCode" placeholder="房间号">
+                            <button id="joinRoomBtn">加入房间</button>
+                        </div>
+                        
+                        <div class="room-list">
+                            <h5>房间列表</h5>
+                            <div id="roomList"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 聊天区域 -->
+                <div class="chat-area">
+                    <div class="chat-header">
+                        <h3 id="currentRoom">请选择一个房间</h3>
+                        <div id="roomInfo"></div>
+                    </div>
+                    
+                    <div class="messages-container" id="messagesContainer">
+                        <div class="welcome-message">
+                            <p>欢迎使用聊天室！请先加入一个房间开始聊天。</p>
+                        </div>
+                    </div>
+                    
+                    <div class="message-input-container">
+                        <input type="text" id="messageInput" placeholder="输入消息..." disabled>
+                        <button id="sendBtn" disabled>发送</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="../script/app.js"></script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 {
-  "name": "Web_ChatRoom",
+  "name": "web_chatroom",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -10,5 +10,13 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.5"
+  }
 }

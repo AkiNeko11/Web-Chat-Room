@@ -80,7 +80,7 @@ async function handleLogin(e) {
     const password = document.getElementById('loginPassword').value;
     
     try {
-        const response = await fetch('http://localhost:3003/api/auth/login', {
+        const response = await fetch('/api/auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -114,7 +114,7 @@ async function handleRegister(e) {
     const password = document.getElementById('registerPassword').value;
     
     try {
-        const response = await fetch('http://localhost:3003/api/auth/register', {
+        const response = await fetch('/api/auth/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -171,7 +171,7 @@ function showChatInterface() {
 // 验证token
 async function validateToken() {
     try {
-        const response = await fetch('http://localhost:3003/api/rooms/list', {
+        const response = await fetch('/api/rooms/list', {
             headers: {
                 'Authorization': `Bearer ${authToken}`
             }
@@ -202,7 +202,7 @@ function initializeSocket() {
         socket.disconnect();
     }
     
-    socket = io('http://localhost:3003', {
+    socket = io('/', {
         auth: {
             token: authToken
         }
@@ -246,7 +246,7 @@ function initializeSocket() {
 // 加载房间列表
 async function loadRooms() {
     try {
-        const response = await fetch('http://localhost:3003/api/rooms/list', {
+        const response = await fetch('/api/rooms/list', {
             headers: {
                 'Authorization': `Bearer ${authToken}`
             }
@@ -294,7 +294,7 @@ async function handleCreateRoom() {
     }
     
     try {
-        const response = await fetch('http://localhost:3003/api/rooms/create', {
+        const response = await fetch('/api/rooms/create', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

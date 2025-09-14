@@ -98,6 +98,7 @@ Web-Chat-Room/
    ```
 
 3. **配置数据库**
+
    (具体参照sql目录下的chatroom.sql文件)
    创建数据库和表：
    ```sql

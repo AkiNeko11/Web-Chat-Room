@@ -22,6 +22,7 @@ const currentRoomElement = document.getElementById('currentRoom');
 const messagesContainer = document.getElementById('messagesContainer');
 const messageInput = document.getElementById('messageInput');
 const sendBtn = document.getElementById('sendBtn');
+const leaveRoomBtn = document.getElementById('leaveRoomBtn');
 
 // 初始化
 document.addEventListener('DOMContentLoaded', function() {
@@ -48,7 +49,7 @@ function bindEventListeners() {
     // 房间相关
     createRoomBtn.addEventListener('click', handleCreateRoom);
     joinRoomBtn.addEventListener('click', handleJoinRoom);
-    
+    leaveRoomBtn.addEventListener('click', handleLeaveRoom);
     // 消息相关
     sendBtn.addEventListener('click', handleSendMessage);
     messageInput.addEventListener('keypress', function(e) {
@@ -168,9 +169,29 @@ function showChatInterface() {
     currentUserElement.textContent = currentUser;
 }
 
+// 解析JWT token获取用户信息
+function parseJWT(token) {
+    try {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+    } catch (error) {
+        return null;
+    }
+}
+
 // 验证token
 async function validateToken() {
     try {
+        // 先从token中解析用户名
+        const payload = parseJWT(authToken);
+        if (payload && payload.username) {
+            currentUser = payload.username;
+        }
+        
         const response = await fetch('/api/rooms/list', {
             headers: {
                 'Authorization': `Bearer ${authToken}`
@@ -180,7 +201,6 @@ async function validateToken() {
         if (response.ok) {
             const data = await response.json();
             if (data.code === 200) {
-                currentUser = data.data[0]?.creator_name || '用户';
                 showChatInterface();
                 initializeSocket();
                 loadRooms();
@@ -337,6 +357,30 @@ function handleJoinRoom() {
     
     // 发送加入房间事件
     socket.emit('join_room', { roomCode });
+}
+
+// 处理离开房间
+function handleLeaveRoom() {
+    if (!socket || !currentRoom) {
+        alert('当前未在任何房间中');
+        return;
+    }
+    
+    // 发送离开房间事件
+    socket.emit('leave_room');
+    
+    // 重置界面状态
+    currentRoom = null;
+    currentRoomElement.textContent = '请选择一个房间';
+    messageInput.disabled = true;
+    sendBtn.disabled = true;
+    
+    // 清空消息容器，显示欢迎信息
+    messagesContainer.innerHTML = `
+        <div class="welcome-message">
+            <p>欢迎使用聊天室！请先加入一个房间开始聊天。</p>
+        </div>
+    `;
 }
 
 // 处理发送消息

@@ -52,7 +52,13 @@ function handleConnection(io, socket) {
             
             // 离开之前的房间
             if (socket.roomCode) {
+                // 向旧房间发送离开消息
+                socket.to(socket.roomCode).emit('user_left', {
+                    username: socket.username,
+                    message: `${socket.username} 离开了房间`
+                });
                 socket.leave(socket.roomCode);
+                console.log(`${socket.username} 离开房间: ${socket.roomCode}`);
             }
             
             // 加入新房间

@@ -339,7 +339,7 @@ async function handleCreateRoom() {
 }
 
 // 处理加入房间
-function handleJoinRoom() {
+async function handleJoinRoom() {
     const roomCode = joinRoomCode.value.trim();
     
     if (!roomCode) {
@@ -354,7 +354,35 @@ function handleJoinRoom() {
     
     // 清空消息容器
     messagesContainer.innerHTML = '';
-    
+
+    // 获取历史消息
+    try {
+        const response = await fetch('/api/messages/getMessages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ roomCode })
+        });
+        
+        const data = await response.json();
+        if (data.code === 200 && data.count > 0) {
+            // 显示历史消息
+            data.data.forEach(msg => {
+                addMessage(msg.username, msg.message, msg.timestamp, msg.isCurrentUser);
+            });
+            
+            // 历史消息分割线
+            addSystemMessage(`以上为 ${data.count} 条历史消息`);
+        } else if (data.count === 0) {
+            addSystemMessage('暂无历史消息');
+        }
+    } catch (error) {
+        console.error('获取历史消息失败:', error);
+        addSystemMessage('获取历史消息失败');
+    }
+
     // 发送加入房间事件
     socket.emit('join_room', { roomCode });
 }
@@ -408,7 +436,7 @@ function addMessage(username, content, timestamp, isOwn = false) {
     const messageElement = document.createElement('div');
     messageElement.className = `message ${isOwn ? 'own' : 'other'}`;
     
-    const time = new Date(timestamp).toLocaleTimeString();
+    const time = new Date(timestamp).toLocaleString();
     
     messageElement.innerHTML = `
         <div class="username">${username}</div>
